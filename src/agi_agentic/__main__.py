@@ -14,6 +14,8 @@ def main() -> None:
     parser.add_argument("--search-url", default=os.getenv("SEARXNG_URL", ""))
     parser.add_argument("--max-rounds", type=int, default=4)
     parser.add_argument("--clock", action="store_true", help="enable the Toolbox clock tool")
+    parser.add_argument("--weather", action="store_true", help="enable Open-Meteo weather by coordinates")
+    parser.add_argument("--desktop", action="store_true", help="enable approved real desktop actions")
     parser.add_argument("--browser-practice", action="store_true", help="enable an isolated browser form exercise")
     parser.add_argument("--show-browser", action="store_true", help="show the browser during the practice exercise")
     args = parser.parse_args()
@@ -33,6 +35,29 @@ def main() -> None:
             parser.error("Install AGi-robot/toolbox to enable the clock")
         tools.append(Tool("current_time", "Get the current time in an IANA time zone.",
                           {"type": "object", "properties": {"timezone": {"type": "string"}}, "required": ["timezone"], "additionalProperties": False}, current_time))
+    if args.weather:
+        try:
+            from agi_toolbox.weather import current_weather
+        except ImportError:
+            parser.error("Install AGi-robot/toolbox to enable weather")
+        tools.append(Tool("current_weather", "Get current weather for latitude and longitude; ask the user if unknown.",
+                          {"type": "object", "properties": {"latitude": {"type": "number"}, "longitude": {"type": "number"}}, "required": ["latitude", "longitude"], "additionalProperties": False}, current_weather))
+    if args.desktop:
+        if not os.isatty(0):
+            parser.error("--desktop requires an interactive terminal for per-action approval")
+        try:
+            from agi_telekinesis.desktop import Desktop
+            desktop = Desktop(lambda action: input(f"{action} [y/N] ").strip().lower() == "y")
+        except ImportError:
+            parser.error("Install AGi-robot/telekinesis with the desktop extra")
+        empty = {"type": "object", "properties": {}, "additionalProperties": False}
+        tools.extend([
+            Tool("desktop_size", "Get primary screen dimensions; you cannot see the screen.", empty, desktop.screen_size),
+            Tool("desktop_click", "Click a user-supplied screen coordinate after approval.",
+                 {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}}, "required": ["x", "y"], "additionalProperties": False}, desktop.click),
+            Tool("desktop_type", "Type printable ASCII into the focused window after approval.",
+                 {"type": "object", "properties": {"text": {"type": "string", "maxLength": 200}}, "required": ["text"], "additionalProperties": False}, desktop.type_text),
+        ])
     if args.show_browser and not args.browser_practice:
         parser.error("--show-browser requires --browser-practice")
     with ExitStack() as stack:
