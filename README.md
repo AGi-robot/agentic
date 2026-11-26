@@ -31,3 +31,5 @@ python -m agi_agentic 'Hello Grace, how are you?' --model MODEL_NAME --lighting-
 This exposes `set_lighting`, `lighting_status`, and `stop_lighting` with automatic tool choice. The model chooses whether to use lighting. No occasion or mood triggers are imposed. Colours, transitions, rainbow, brightness and rhythms follow [Console's lighting contract](https://github.com/Project-AGi/console/blob/dev/LIGHTING.md).
 
 The same flag also offers `lighting_catalog` and `save_lighting_preset` so the model can read and expand the editable Markdown catalogue, including new colours and programmable rhythm patterns.
+
+Set/save/stop tools require a brief reason and saved effects can describe a personal signal's meaning. Use `preset='default'` to restore activity lighting. Regular chat's persistent reason memory is handled by Interactive and Memory; this standalone CLI does not write Grace's conversation database.

@@ -45,7 +45,7 @@ def main() -> None:
                           {"type": "object", "properties": {"latitude": {"type": "number"}, "longitude": {"type": "number"}}, "required": ["latitude", "longitude"], "additionalProperties": False}, current_weather))
     if args.lighting_url:
         try:
-            from agi_toolbox.lighting import LightingClient, LIGHTING_PARAMETERS, LIGHTING_DESCRIPTION, SAVE_LIGHTING_PARAMETERS
+            from agi_toolbox.lighting import LightingClient, LIGHTING_PARAMETERS, LIGHTING_DESCRIPTION, SAVE_LIGHTING_PARAMETERS, STOP_LIGHTING_PARAMETERS
         except ImportError:
             parser.error("Install Project-AGi/toolbox with lighting support")
         lighting = LightingClient(args.lighting_url)
@@ -55,7 +55,7 @@ def main() -> None:
             Tool("save_lighting_preset", "Add or replace an effect and optional named colours in the persistent Markdown catalogue. New rhythms can use rhythm_pattern. Does not activate the effect.", SAVE_LIGHTING_PARAMETERS, lighting.save_preset),
             Tool("set_lighting", LIGHTING_DESCRIPTION, LIGHTING_PARAMETERS, lighting.set_effect),
             Tool("lighting_status", "Inspect the current lighting effect and device connection.", empty, lighting.status),
-            Tool("stop_lighting", "Stop the custom effect and restore activity lighting.", empty, lighting.stop),
+            Tool("stop_lighting", "Restore default activity lighting with a brief reason.", STOP_LIGHTING_PARAMETERS, lighting.stop),
         ])
     if args.desktop:
         if not os.isatty(0):
