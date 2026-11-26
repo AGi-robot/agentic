@@ -15,6 +15,7 @@ def main() -> None:
     parser.add_argument("--max-rounds", type=int, default=4)
     parser.add_argument("--clock", action="store_true", help="enable the Toolbox clock tool")
     parser.add_argument("--weather", action="store_true", help="enable Open-Meteo weather by coordinates")
+    parser.add_argument("--lighting-url", default="", help="enable lighting tools using this Console URL")
     parser.add_argument("--desktop", action="store_true", help="enable approved real desktop actions")
     parser.add_argument("--browser-practice", action="store_true", help="enable an isolated browser form exercise")
     parser.add_argument("--show-browser", action="store_true", help="show the browser during the practice exercise")
@@ -42,6 +43,20 @@ def main() -> None:
             parser.error("Install AGi-robot/toolbox to enable weather")
         tools.append(Tool("current_weather", "Get current weather for latitude and longitude; ask the user if unknown.",
                           {"type": "object", "properties": {"latitude": {"type": "number"}, "longitude": {"type": "number"}}, "required": ["latitude", "longitude"], "additionalProperties": False}, current_weather))
+    if args.lighting_url:
+        try:
+            from agi_toolbox.lighting import LightingClient, LIGHTING_PARAMETERS, LIGHTING_DESCRIPTION, SAVE_LIGHTING_PARAMETERS
+        except ImportError:
+            parser.error("Install Project-AGi/toolbox with lighting support")
+        lighting = LightingClient(args.lighting_url)
+        empty = {"type": "object", "properties": {}, "additionalProperties": False}
+        tools.extend([
+            Tool("lighting_catalog", "Read editable colour names and saved lighting effects.", empty, lighting.catalog),
+            Tool("save_lighting_preset", "Add or replace an effect and optional named colours in the persistent Markdown catalogue. New rhythms can use rhythm_pattern. Does not activate the effect.", SAVE_LIGHTING_PARAMETERS, lighting.save_preset),
+            Tool("set_lighting", LIGHTING_DESCRIPTION, LIGHTING_PARAMETERS, lighting.set_effect),
+            Tool("lighting_status", "Inspect the current lighting effect and device connection.", empty, lighting.status),
+            Tool("stop_lighting", "Stop the custom effect and restore activity lighting.", empty, lighting.stop),
+        ])
     if args.desktop:
         if not os.isatty(0):
             parser.error("--desktop requires an interactive terminal for per-action approval")
