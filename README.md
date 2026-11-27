@@ -22,13 +22,13 @@ Use `--weather` for Open-Meteo current weather by latitude and longitude. Use `-
 
 ## Expressive lighting tool
 
-Install the matching Toolbox lighting client and run Console with its OpenRGB bridge:
+Install the matching Toolbox lighting client and run the independent Toolbox lighting service (`grace-lighting`):
 
 ```bash
-python -m agi_agentic 'Hello Grace, how are you?' --model MODEL_NAME --lighting-url http://127.0.0.1:8853
+python -m agi_agentic 'Hello Grace, how are you?' --model MODEL_NAME --lighting-url http://127.0.0.1:8854
 ```
 
-This exposes `set_lighting`, `lighting_status`, and `stop_lighting` with automatic tool choice. The model chooses whether to use lighting. No occasion or mood triggers are imposed. Colours, transitions, rainbow, brightness and rhythms follow [Console's lighting contract](https://github.com/Project-AGi/console/blob/dev/LIGHTING.md).
+This exposes `set_lighting`, `lighting_status`, and `stop_lighting` with automatic tool choice. The model chooses whether to use lighting. No occasion or mood triggers are imposed. Colours, transitions, rainbow, brightness and rhythms follow [Toolbox's lighting contract](https://github.com/Project-AGi/toolbox/blob/dev/LIGHTING.md).
 
 The same flag also offers `lighting_catalog` and `save_lighting_preset` so the model can read and expand the editable Markdown catalogue, including new colours and programmable rhythm patterns.
 

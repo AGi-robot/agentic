@@ -15,7 +15,7 @@ def main() -> None:
     parser.add_argument("--max-rounds", type=int, default=4)
     parser.add_argument("--clock", action="store_true", help="enable the Toolbox clock tool")
     parser.add_argument("--weather", action="store_true", help="enable Open-Meteo weather by coordinates")
-    parser.add_argument("--lighting-url", default="", help="enable lighting tools using this Console URL")
+    parser.add_argument("--lighting-url", default="", help="enable lighting tools using this independent lighting service URL")
     parser.add_argument("--desktop", action="store_true", help="enable approved real desktop actions")
     parser.add_argument("--browser-practice", action="store_true", help="enable an isolated browser form exercise")
     parser.add_argument("--show-browser", action="store_true", help="show the browser during the practice exercise")
