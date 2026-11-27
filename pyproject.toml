@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agi-agentic"
 version = "0.1.0"
-description = "A small tool-calling loop for Grace"
+description = "A small tool-calling loop for AIVA"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "AGPL-3.0-only"}
 dependencies = ["httpx>=0.27,<1"]
 
 [project.scripts]
-grace-agent = "agi_agentic.__main__:main"
+aiva-agent = "agi_agentic.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

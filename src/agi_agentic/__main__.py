@@ -15,7 +15,7 @@ def main() -> None:
     parser.add_argument("--max-rounds", type=int, default=4)
     parser.add_argument("--clock", action="store_true", help="enable the Toolbox clock tool")
     parser.add_argument("--weather", action="store_true", help="enable Open-Meteo weather by coordinates")
-    parser.add_argument("--lighting-url", default="", help="enable lighting tools using this Console URL")
+    parser.add_argument("--lighting-url", default="", help="enable lighting tools using this independent lighting service URL")
     parser.add_argument("--desktop", action="store_true", help="enable approved real desktop actions")
     parser.add_argument("--browser-practice", action="store_true", help="enable an isolated browser form exercise")
     parser.add_argument("--show-browser", action="store_true", help="show the browser during the practice exercise")
@@ -25,7 +25,7 @@ def main() -> None:
         try:
             from agi_research import search
         except ImportError:
-            parser.error("Install AGi-robot/research to enable search")
+            parser.error("Install Project-AGi/research to enable search")
         tools.append(Tool("web_search", "Search the web for source titles, URLs and snippets.",
                           {"type": "object", "properties": {"query": {"type": "string", "maxLength": 500}}, "required": ["query"], "additionalProperties": False},
                           lambda query: search(query, base_url=args.search_url)))
@@ -33,14 +33,14 @@ def main() -> None:
         try:
             from agi_toolbox import current_time
         except ImportError:
-            parser.error("Install AGi-robot/toolbox to enable the clock")
+            parser.error("Install Project-AGi/toolbox to enable the clock")
         tools.append(Tool("current_time", "Get the current time in an IANA time zone.",
                           {"type": "object", "properties": {"timezone": {"type": "string"}}, "required": ["timezone"], "additionalProperties": False}, current_time))
     if args.weather:
         try:
             from agi_toolbox.weather import current_weather
         except ImportError:
-            parser.error("Install AGi-robot/toolbox to enable weather")
+            parser.error("Install Project-AGi/toolbox to enable weather")
         tools.append(Tool("current_weather", "Get current weather for latitude and longitude; ask the user if unknown.",
                           {"type": "object", "properties": {"latitude": {"type": "number"}, "longitude": {"type": "number"}}, "required": ["latitude", "longitude"], "additionalProperties": False}, current_weather))
     if args.lighting_url:
@@ -64,7 +64,7 @@ def main() -> None:
             from agi_telekinesis.desktop import Desktop
             desktop = Desktop(lambda action: input(f"{action} [y/N] ").strip().lower() == "y")
         except ImportError:
-            parser.error("Install AGi-robot/telekinesis with the desktop extra")
+            parser.error("Install Project-AGi/telekinesis with the desktop extra")
         empty = {"type": "object", "properties": {}, "additionalProperties": False}
         tools.extend([
             Tool("desktop_size", "Get primary screen dimensions; you cannot see the screen.", empty, desktop.screen_size),
@@ -80,7 +80,7 @@ def main() -> None:
             try:
                 from agi_telekinesis import PracticeBrowser
             except ImportError:
-                parser.error("Install AGi-robot/telekinesis and its Chromium browser")
+                parser.error("Install Project-AGi/telekinesis and its Chromium browser")
             browser = stack.enter_context(PracticeBrowser(headless=not args.show_browser))
             empty = {"type": "object", "properties": {}, "additionalProperties": False}
             tools.extend([

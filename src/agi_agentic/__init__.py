@@ -23,7 +23,7 @@ def run(prompt: str, *, base_url: str, model: str, tools: list[Tool], api_key: s
     """Run up to max_rounds tool-call turns; raise if no final answer arrives."""
     if not prompt.strip() or not model.strip() or not base_url.startswith(("http://", "https://")):
         raise ValueError("prompt, model and an HTTP(S) base_url are required")
-    if not 1 <= max_rounds <= 10 or len({t.name for t in tools}) != len(tools):
+    if type(max_rounds) is not int or not 1 <= max_rounds <= 10 or len({t.name for t in tools}) != len(tools):
         raise ValueError("max_rounds must be 1–10 and tool names must be unique")
     registry = {tool.name: tool for tool in tools}
     messages: list[dict[str, Any]] = [
@@ -46,6 +46,13 @@ def run(prompt: str, *, base_url: str, model: str, tools: list[Tool], api_key: s
                 if choice.get("finish_reason") not in ("stop", None) or not isinstance(message.get("content"), str) or not message["content"].strip():
                     raise ValueError("model returned an incomplete or empty answer")
                 return message["content"].strip()
+            if choice.get("finish_reason") != "tool_calls":
+                raise ValueError("model returned incomplete tool calls")
+            if not isinstance(calls, list) or any(not isinstance(call, dict) for call in calls):
+                raise ValueError("model returned invalid tool calls")
+            ids = [call.get("id") for call in calls]
+            if any(not isinstance(identifier, str) or not identifier for identifier in ids) or len(set(ids)) != len(ids):
+                raise ValueError("tool call IDs must be non-empty and unique")
             if iteration == max_rounds or len(calls) > 5:
                 raise RuntimeError("model exceeded the tool-call limit")
             messages.append(message)
